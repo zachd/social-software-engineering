@@ -15,8 +15,8 @@ stanzas:
     #
     # The path given is for Stack projects. If you're still using cabal, change
     # to
-    # exec: ../dist/build/yesod-test/yesod-test
-    exec: ../dist/bin/yesod-test
+    # exec: ../dist/build/networked-sql/networked-sql
+    exec: ../dist/bin/networked-sql
 
     # Command line options passed to your application.
     args: []
@@ -25,7 +25,7 @@ stanzas:
       # You can specify one or more hostnames for your application to respond
       # to. The primary hostname will be used for generating your application
       # root.
-      - www.yesod-test.com
+      - www.networked-sql.com
 
     # Enable to force Keter to redirect to https
     # Can be added to any stanza
@@ -34,7 +34,7 @@ stanzas:
   # Static files.
   - type: static-files
     hosts:
-      - static.yesod-test.com
+      - static.networked-sql.com
     root: ../static
 
     # Uncomment to turn on directory listings.
@@ -44,9 +44,9 @@ stanzas:
   - type: redirect
 
     hosts:
-      - yesod-test.com
+      - networked-sql.com
     actions:
-      - host: www.yesod-test.com
+      - host: www.networked-sql.com
         # secure: false
         # port: 80
 

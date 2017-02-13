@@ -1,0 +1,44 @@
+how to install:
+new app: stack new app-name yesod-simple
+install ghc: stack setup
+build files: stack build -j5
+run webserver: stack exec app-name
+ensure that yesod-auth, yesod-auth-oauth, yesod-auth-oauth2 added to .cabal
+add library with version number to extra-deps in .yaml if error occurs
+
+classes:
+think of classes like interfaces from java
+object implements the interface functions for a datatype
+datatype can then be passed and class functions used
+read more in book about classes/objects
+
+adding a page:
+create Test.hs file, handler called getTestR 
+add reference to hamlet with widgetFile test at the end
+create hamlet html file templates/test.hamlet
+add route referencing handler name with GET (/test testR)
+add import Handler.Test to Application.hs
+add handler to .cabal in library -> exposed-modules, Handler.Test
+
+haskell types:
+Maybe = Nothing | Just x
+Either = Left x | Right y (Left for error, right for no error)
+
+terminating recursion:
+global: # of projects, # of calls
+local: time based, attribute filter, time to live
+
+getProject :: [Project] -> Int
+[1,2,3] -> extract ProjectInfo
+users <- extract ProjectMembership
+map getUser (hops -1) users
+
+getUser :: User -> IO()
+projects <- extract UserInfo
+[1,2,3] <- extract Projects
+getUser 0 = return()
+map GerProject projects
+
+structure:
+hops decrementing, check for zero
+projects users seen before are compared

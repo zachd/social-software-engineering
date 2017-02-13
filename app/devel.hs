@@ -1,5 +1,5 @@
 {-# LANGUAGE PackageImports #-}
-import "yesod-test" Application (develMain)
+import "networked-sql" Application (develMain)
 import Prelude (IO)
 
 main :: IO ()
