@@ -24,6 +24,10 @@ haskell types:
 Maybe = Nothing | Just x
 Either = Left x | Right y (Left for error, right for no error)
 
+adding env variables:
+export GITHUB_CLIENT_ID=x
+export GITHIB_CLIENT_SECRET=x
+
 terminating recursion:
 global: # of projects, # of calls
 local: time based, attribute filter, time to live
