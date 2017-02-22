@@ -1,3 +1,6 @@
+SETUP
+========
+
 how to install:
 new app: stack new app-name yesod-simple
 install ghc: stack setup
@@ -20,28 +23,22 @@ add route referencing handler name with GET (/test testR)
 add import Handler.Test to Application.hs
 add handler to .cabal in library -> exposed-modules, Handler.Test
 
-haskell types:
-Maybe = Nothing | Just x
-Either = Left x | Right y (Left for error, right for no error)
+create github app:
+user -> settings -> Oauth applications
+create new app with url http://localhost:3000
+callback url http://localhost:3000/auth/page/github/callback
 
 adding env variables:
 export GITHUB_CLIENT_ID=x
 export GITHIB_CLIENT_SECRET=x
 
+
+NOTES
+=======
+
 terminating recursion:
 global: # of projects, # of calls
 local: time based, attribute filter, time to live
-
-getProject :: [Project] -> Int
-[1,2,3] -> extract ProjectInfo
-users <- extract ProjectMembership
-map getUser (hops -1) users
-
-getUser :: User -> IO()
-projects <- extract UserInfo
-[1,2,3] <- extract Projects
-getUser 0 = return()
-map GerProject projects
 
 structure:
 hops decrementing, check for zero
@@ -54,3 +51,22 @@ possibly showing owner/member/user relationships
 web structure:
 web server, crawler, SQL database, threads, graph database.
 different visualisation - add a search query
+
+
+HASKELL
+==========
+
+haskell types:
+Maybe = Nothing | Just x
+Either = Left x | Right y (Left for error, right for no error)
+
+getProject :: [Project] -> Int
+[1,2,3] -> extract ProjectInfo
+users <- extract ProjectMembership
+map getUser (hops -1) users
+
+getUser :: User -> IO()
+projects <- extract UserInfo
+[1,2,3] <- extract Projects
+getUser 0 = return()
+map GerProject projects
