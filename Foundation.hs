@@ -4,6 +4,8 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
+import System.Environment (getEnv)
+
 
 -- Used only when in "auth-dummy-login" setting is enabled.
 --import Yesod.Auth.Dummy
@@ -11,14 +13,15 @@ import Text.Jasmine         (minifym)
 import Yesod.Auth.OAuth2.Github
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
-import System.Environment (getEnv)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+
 import qualified Data.Text as T
 
 
--- OAuthKeys From: https://git.io/vDouV
+-- OAuthKeys
+-- From https://robots.thoughtbot.com/on-auth-and-tests-in-yesod
 data OAuthKeys = OAuthKeys
     { oauthKeysClientId :: Text
     , oauthKeysClientSecret :: Text
@@ -28,6 +31,7 @@ loadOAuthKeysEnv :: String -> IO OAuthKeys
 loadOAuthKeysEnv prefix = OAuthKeys
     <$> (getEnvT $ prefix <> "_CLIENT_ID")
     <*> (getEnvT $ prefix <> "_CLIENT_SECRET")
+
   where
     getEnvT = fmap T.pack . getEnv
 

@@ -42,3 +42,11 @@ map GerProject projects
 structure:
 hops decrementing, check for zero
 projects users seen before are compared
+
+d3 graph layout:
+project in center, connected to users
+possibly showing owner/member/user relationships
+
+web structure:
+web server, crawler, SQL database, threads, graph database.
+different visualisation - add a search query
