@@ -8,9 +8,13 @@
 
     <p>
       Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>
+      #{show repos}
+
+    <p>
+      Login: #{show login}
 
     <p>
       Email: #{show email}
 
     <p>
-      Email: #{show token}
+      Token: #{show token}
