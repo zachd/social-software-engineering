@@ -96,6 +96,7 @@ library
                  , time
                  , case-insensitive
                  , wai
+                 , github
 
 executable         networked-sql
     if flag(library-only)

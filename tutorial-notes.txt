@@ -30,7 +30,12 @@ callback url http://localhost:3000/auth/page/github/callback
 
 adding env variables:
 export GITHUB_CLIENT_ID=x
-export GITHIB_CLIENT_SECRET=x
+export GITHUB_CLIENT_SECRET=x
+
+adding extra data to session:
+ensure credsExtra data from OAUTH2 is in the session
+use the code from yesod-auth-oauth2 sample file
+put this in Foundation.hs under instance YesodAuth App (authenticate creds)
 
 
 NOTES

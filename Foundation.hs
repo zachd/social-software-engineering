@@ -221,6 +221,11 @@ instance YesodAuth App where
 
     authenticate creds = runDB $ do
         x <- getBy $ UniqueUser $ credsIdent creds
+        -- Set session from https://git.io/vybuB
+        mapM_ (uncurry setSession) $
+            [ ("credsIdent", credsIdent creds)
+            , ("credsPlugin", credsPlugin creds)
+            ] ++ credsExtra creds
         case x of
             Just (Entity uid _) -> return $ Authenticated uid
             Nothing -> Authenticated <$> insert User
