@@ -7,14 +7,16 @@
       This page is protected and access is allowed only for authenticated users.
 
     <p>
-      Your data is protected with us <strong><span class="username">#{userIdent user}</span></strong>
-      #{show repos}
-
-    <p>
-      Login: #{show login}
+      Your data is protected with us <strong>#{show login}</strong> (#{userIdent user})
 
     <p>
       Email: #{show email}
 
     <p>
       Token: #{show token}
+
+    <p>
+      Repos: #{show repos}
+
+    <p>
+      Followers: #{show followers}
