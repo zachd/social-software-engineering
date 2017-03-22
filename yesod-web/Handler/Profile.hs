@@ -18,23 +18,12 @@ getProfileR = do
     let token = fromJust $ lookup "access_token" sess
 
     let githubName = decodeUtf8 login
-    let githubUserName = GitHub.mkUserName githubName
-    let githubOwnerName = GitHub.mkOwnerName githubName
 
     -- Get repos for user
-    reposRequest <- liftIO $ GitHubRepos.userRepos githubOwnerName GitHub.Data.Repos.RepoPublicityAll
-    getRepos <- case reposRequest of
-        Left e -> error $ show e
-        Right res -> return res
-    let repos = map formatRepo getRepos
+    repos <- liftIO $ getRepos githubName
 
     -- Get followers for user
-    followersRequest <- liftIO $ GitHubFollowers.usersFollowing githubUserName
-    getFollowers <- case followersRequest of
-        Left e -> error $ show e
-        Right res -> return res
-    let followers = map formatUser getFollowers
-
+    followers <- liftIO $ getFollowers githubName
 
     defaultLayout $ do
         setTitle . toHtml $ userIdent user <> "'s User page"
@@ -46,3 +35,21 @@ formatRepo = GitHubRepos.untagName . GitHub.Data.Repos.repoName
 
 formatUser :: SimpleUser -> Text
 formatUser = GitHub.untagName . GitHub.simpleUserLogin
+
+getRepos :: Text -> IO (Vector Text)
+getRepos name = do
+    let owner = GitHub.mkOwnerName name
+    request <- liftIO $ GitHubRepos.userRepos owner GitHub.Data.Repos.RepoPublicityAll
+    result <- case request of
+        Left e -> error $ show e
+        Right res -> return res
+    return $ map formatRepo result
+
+getFollowers :: Text -> IO (Vector Text)
+getFollowers name = do
+    let user = GitHub.mkUserName name
+    request <- liftIO $ GitHubFollowers.usersFollowing user
+    result <- case request of
+        Left e -> error $ show e
+        Right res -> return res
+    return $ map formatUser result
