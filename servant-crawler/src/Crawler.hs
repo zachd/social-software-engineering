@@ -53,4 +53,3 @@ isaac :: User
 isaac = User 1 "Isaac" "Newton"
 
 albert :: User
-albert = User 2 "Albert" "Einstein"

@@ -2,7 +2,7 @@ SETUP
 ========
 
 how to install:
-new app: stack new app-name yesod-simple
+new app: stack new app-name yesod-sqlite
 install ghc: stack setup
 build files: stack build -j5
 run webserver: stack exec app-name
