@@ -14,24 +14,28 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 import GitHubAPI
+import Control.Monad.Trans.Except
+import Control.Monad.IO.Class (liftIO)
 
 
 -- Type definitions
-type API = "crawl" :> Get '[JSON] String
+type API = "crawl" :> Capture "user" String :> Get '[JSON] String
 
 
 -- App setup
 startApp :: IO ()
 startApp = Network.Wai.Handler.Warp.run 8080 app
+
 app :: Application
 app = serve api server
+
 api :: Proxy API
 api = Proxy
 
 -- Server
 server :: Server API
-server = return crawl
+server = crawl
 
-crawl :: String
-crawl = "test"
+crawl :: String -> Handler String
+crawl user = return user
 

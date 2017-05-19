@@ -23,6 +23,7 @@ library
                      , text
                      , vector
                      , hasbolt
+                     , transformers
   default-language:    Haskell2010
 
 executable servant-crawler
