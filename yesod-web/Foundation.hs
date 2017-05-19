@@ -4,7 +4,6 @@ import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
 import Text.Jasmine         (minifym)
-import System.Environment (getEnv)
 
 
 -- Used only when in "auth-dummy-login" setting is enabled.
@@ -17,23 +16,12 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
 
-import qualified Data.Text as T
 
+clientId :: Text
+clientId = "38ce4dc27f39e1985781"
 
--- OAuthKeys
--- From https://robots.thoughtbot.com/on-auth-and-tests-in-yesod
-data OAuthKeys = OAuthKeys
-    { oauthKeysClientId :: Text
-    , oauthKeysClientSecret :: Text
-    }
-
-loadOAuthKeysEnv :: String -> IO OAuthKeys
-loadOAuthKeysEnv prefix = OAuthKeys
-    <$> (getEnvT $ prefix <> "_CLIENT_ID")
-    <*> (getEnvT $ prefix <> "_CLIENT_SECRET")
-
-  where
-    getEnvT = fmap T.pack . getEnv
+clientSecret :: Text
+clientSecret = "73fb0789eeb3c125eb553c87f9e1760134d3c095"
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -45,7 +33,6 @@ data App = App
     , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
-    , appGithubKeys  :: OAuthKeys
     }
 
 data MenuItem = MenuItem
@@ -234,13 +221,7 @@ instance YesodAuth App where
                 }
 
     -- You can add other plugins like Google Email, email or OAuth here
-    authPlugins app =  [ oauth2Github
-            (oauthKeysClientId $ appGithubKeys app)
-            (oauthKeysClientSecret $ appGithubKeys app)
-            ]
-    --authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
-        -- Enable authDummy login if enabled.
-    --    where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
+    authPlugins app = [oauth2Github clientId clientSecret]
 
     authHttpManager = getHttpManager
 

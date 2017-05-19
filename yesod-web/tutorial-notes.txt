@@ -28,9 +28,15 @@ user -> settings -> Oauth applications
 create new app with url http://localhost:3000
 callback url http://localhost:3000/auth/page/github/callback
 
-adding env variables:
-export GITHUB_CLIENT_ID=x
-export GITHUB_CLIENT_SECRET=x
+adding github app keys in Foundation.hs:
+clientId :: Text
+clientId = "38ce4dc27f39e1985781"
+
+clientSecret :: Text
+clientSecret = "73fb0789eeb3c125eb553c87f9e1760134d3c095"
+
+adding github oauth loading to Foundation.hs:
+replace authPlugins app with [oauth2Github clientId clientSecret]
 
 adding extra data to session:
 ensure credsExtra data from OAUTH2 is in the session
