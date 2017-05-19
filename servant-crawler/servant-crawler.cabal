@@ -14,6 +14,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Crawler
                      , GitHubAPI
+                     , DatabaseAPI
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant-server
@@ -24,6 +25,7 @@ library
                      , vector
                      , hasbolt
                      , transformers
+                     , containers
   default-language:    Haskell2010
 
 executable servant-crawler

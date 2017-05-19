@@ -1,12 +1,15 @@
 {-# LANGUAGE DataKinds       #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Crawler
     ( startApp
     , app
     ) where
 
+import Data.Text
+import Data.String
 import Data.Aeson
 import Data.Aeson.TH
 import Database.Bolt
@@ -14,6 +17,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 import GitHubAPI
+import DatabaseAPI
 import Control.Monad.Trans.Except
 import Control.Monad.IO.Class (liftIO)
 
@@ -37,5 +41,8 @@ server :: Server API
 server = crawl
 
 crawl :: String -> Handler String
-crawl user = return user
+crawl user = liftIO $ do
+  -- repos <- getRepos (fromString user)
+  addUser user
+  return user
 

@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings      #-}
+
 module GitHubAPI where
 
 import Data.Text
