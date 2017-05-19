@@ -16,18 +16,9 @@ import Servant
 import GitHubAPI
 
 
-data User = User
-  { userId        :: Int
-  , userFirstName :: String
-  , userLastName  :: String
-  } deriving (Eq, Show)
-
-$(deriveJSON defaultOptions ''User)
-
 -- Type definitions
-type API = "users" :> Get '[JSON] [User]
-           :<|> "albert" :> Get '[JSON] User
-           :<|> "isaac" :> Get '[JSON] User
+type API = "crawl" :> Get '[JSON] String
+
 
 -- App setup
 startApp :: IO ()
@@ -39,17 +30,8 @@ api = Proxy
 
 -- Server
 server :: Server API
-server = return users
-     :<|> return albert
-     :<|> return isaac
+server = return crawl
 
--- Handlers
-users :: [User]
-users = [ User 1 "Isaac" "Newton"
-        , User 2 "Albert" "Einstein"
-        ]
+crawl :: String
+crawl = "test"
 
-isaac :: User
-isaac = User 1 "Isaac" "Newton"
-
-albert :: User
