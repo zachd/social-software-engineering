@@ -23,7 +23,7 @@ import Control.Monad.IO.Class (liftIO)
 
 
 -- Type definitions
-type API = "crawl" :> Capture "user" String :> Get '[JSON] String
+type API = "crawl" :> Capture "user" String :> Capture "token" String :> Get '[JSON] String
 
 
 -- App setup
@@ -40,8 +40,8 @@ api = Proxy
 server :: Server API
 server = crawl
 
-crawl :: String -> Handler String
-crawl user = liftIO $ do
+crawl :: String -> String -> Handler String
+crawl user token = liftIO $ do
   addUser user
-  result <- crawlUser (fromString user)
+  result <- crawlUser (fromString user) token
   return user

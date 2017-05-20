@@ -20,7 +20,7 @@ config = def { user = "neo4j", password = "neo4j"}
 addUser :: String -> IO()
 addUser user = do
     pipe <- connect config
-    result <- run pipe $ queryP "CREATE (n:User {name: {name}})"
+    result <- run pipe $ queryP "MERGE (n:User {name: {name}})"
                               (fromList [("name", T (fromString user))])
     close pipe
 
@@ -28,9 +28,18 @@ addRepo :: (Text, Text) -> IO()
 addRepo (owner_name, repo_name) = do
     logMsg ["Adding Repo: ", unpack owner_name, "/", unpack repo_name, "\n"]
     pipe <- connect config
-    result <- run pipe $ queryP "CREATE (n:Repo {owner: {owner}, name: {name}})"
+    result <- run pipe $ queryP "MERGE (n:Repo {owner: {owner}, name: {name}})"
                                 (fromList [("owner", T(owner_name)), ("name", T (repo_name))])
-    result <- run pipe $ query $ Data.Text.pack $ addLink owner_name owner_name repo_name "CONTRIBUTES"
+    result <- run pipe $ query $ Data.Text.pack $ addLink owner_name owner_name repo_name "OWNER"
+    close pipe
+
+addContributor :: (Text, Text) -> Text -> IO()
+addContributor (owner_name, repo_name) contrib_name = do
+    logMsg ["Adding Contributor: ", unpack contrib_name, "\n"]
+    pipe <- connect config
+    result <- run pipe $ queryP "MERGE (n:User {name: {name}})"
+                              (fromList [("name", T (contrib_name))])
+    result <- run pipe $ query $ Data.Text.pack $ addLink contrib_name owner_name repo_name "CONTRIBUTOR"
     close pipe
 
 addLink :: Text -> Text -> Text -> String -> String

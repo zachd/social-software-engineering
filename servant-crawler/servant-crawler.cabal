@@ -24,6 +24,7 @@ library
                      , text
                      , vector
                      , hasbolt
+                     , bytestring
                      , transformers
                      , containers
   default-language:    Haskell2010

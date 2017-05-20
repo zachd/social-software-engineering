@@ -6,7 +6,9 @@ import DatabaseAPI
 import Data.Text
 import Data.Vector
 import GitHub
+import GitHub.Auth
 import GitHub.Data
+import qualified Data.ByteString.Char8 as BS
 import qualified GitHub.Endpoints.Users as GitHubUsers
 import qualified GitHub.Endpoints.Repos as GitHubRepos
 import qualified GitHub.Endpoints.Users.Followers as GitHubFollowers
@@ -26,19 +28,20 @@ formatRepo repo = do
     (owner_name, repo_name)
 
 -- Begin Crawl
-crawlUser :: Text -> IO (Vector (Text, Text))
-crawlUser user = do
+crawlUser :: Text -> String -> IO (Vector (Text, Text))
+crawlUser user token = do
     logMsg ["Crawl started from user: ", unpack user, "\n"]
-    repos <- getUserRepos user
+    let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
+    repos <- getUserRepos user auth
     result <- Data.Vector.mapM addRepo repos
-    result_two <- Data.Vector.mapM crawlRepo repos
+    result_two <- Data.Vector.mapM (crawlRepo auth) repos
     return repos
 
-crawlRepo :: (Text, Text) -> IO (Vector Contributor)
-crawlRepo (owner, repo) = do
-    logMsg ["Crawl started from repo: ", unpack owner, "/", unpack repo, "\n"]
-    contributors <- getRepoContributors owner repo
-    --result <- Data.Vector.mapM addContributor contributors
+crawlRepo :: Maybe Auth -> (Text, Text) -> IO (Vector Text)
+crawlRepo auth (owner, repo) = do
+    logMsg ["Crawling repo: ", unpack owner, "/", unpack repo, "\n"]
+    contributors <- getRepoContributors (owner, repo) auth
+    result <- Data.Vector.mapM (addContributor (owner, repo)) contributors
     return contributors
 
 -- API Requests
@@ -51,10 +54,10 @@ getUserInfo name = do
         Right res -> return res
     return result
 
-getUserRepos :: Text -> IO (Vector (Text, Text))
-getUserRepos name = do
+getUserRepos :: Text -> Maybe Auth -> IO (Vector (Text, Text))
+getUserRepos name auth = do
     let owner = GitHub.mkOwnerName name
-    request <- GitHubRepos.userRepos owner RepoPublicityAll
+    request <- GitHubRepos.userRepos' auth owner RepoPublicityPublic
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
@@ -69,12 +72,12 @@ getUserFollowers name = do
         Right res -> return res
     return $ Data.Vector.map formatUser result
 
-getRepoContributors :: Text -> Text -> IO (Vector Contributor)
-getRepoContributors owner repo = do
+getRepoContributors :: (Text, Text) -> Maybe Auth -> IO (Vector Text)
+getRepoContributors (owner, repo) auth = do
     let github_owner = GitHub.mkOwnerName owner
     let github_repo = GitHub.mkRepoName repo
-    request <- GitHubRepos.contributors github_owner github_repo
+    request <- GitHubRepos.contributors' auth github_owner github_repo
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
-    return $ result
+    return $ Data.Vector.map formatContributor result
