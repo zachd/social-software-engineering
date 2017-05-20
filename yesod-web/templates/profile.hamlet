@@ -4,19 +4,14 @@
       Access granted!
 
     <p>
-      This page is protected and access is allowed only for authenticated users.
+      Your data is protected with us <strong>#{decodeUtf8 login}</strong> (#{userIdent user})
 
     <p>
-      Your data is protected with us <strong>#{show login}</strong> (#{userIdent user})
+      <a class="btn btn-info btn-lg" href="http://localhost:8080/crawl/#{decodeUtf8 login}/#{decodeUtf8 token}">
+        Crawl Data
 
     <p>
-      Email: #{show email}
+      Email: #{decodeUtf8 email}
 
     <p>
-      Token: #{show token}
-
-    <p>
-      Repos: #{show repos}
-
-    <p>
-      Followers: #{show followers}
+      Token: #{decodeUtf8 token}
