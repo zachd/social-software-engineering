@@ -24,15 +24,15 @@ addUser user = do
                               (fromList [("name", T (fromString user))])
     close pipe
 
-addRepo :: Repo -> IO()
-addRepo repo = do
+addRepo :: Text -> Repo -> IO()
+addRepo user repo = do
     let owner = GitHubRepos.repoOwner repo
     let owner_name = formatName $ simpleOwnerLogin owner
     let repo_name = formatName $ GitHubRepos.repoName repo
     logMsg ["Adding Repo: ", owner_name, "/", repo_name, "\n"]
     pipe <- connect config
-    result <- run pipe $ queryP "CREATE (n:Repo {owner: {owner}, name: {name}})"
-                              (fromList [("owner", T(fromString owner_name)), ("name", T (fromString repo_name))])
+    result <- run pipe $ queryP "MERGE (u:User {name: {user}})-[:CONTRIBUTES]->(r:Repo {owner: {owner}, name: {name}})"
+                              (fromList [("user", T(user)), ("owner", T(fromString owner_name)), ("name", T (fromString repo_name))])
     close pipe
 
 

@@ -27,7 +27,7 @@ crawlUser :: Text -> IO (Vector Repo)
 crawlUser user = do
     logMsg ["Crawl started from user: ", unpack user, "\n"]
     repos <- getUserRepos user
-    add <- Data.Vector.mapM addRepo repos
+    result <- Data.Vector.mapM (addRepo user) repos
     return repos
 
 

@@ -42,5 +42,6 @@ server = crawl
 
 crawl :: String -> Handler String
 crawl user = liftIO $ do
+  addUser user
   result <- crawlUser (fromString user)
   return user
