@@ -36,7 +36,7 @@ crawlOrg org token = do
     result <- Data.Vector.mapM addRepo repos
     result_two <- Data.Vector.mapM (crawlRepo auth) repos
     return repos
-
+    
 crawlUser :: Text -> String -> IO (Vector (Text, Text))
 crawlUser user token = do
     logMsg ["Crawl started for user: ", unpack user, "\n"]
