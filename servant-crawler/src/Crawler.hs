@@ -43,6 +43,7 @@ server = crawl
 crawl :: String -> Handler String
 crawl user = liftIO $ do
   -- repos <- getRepos (fromString user)
+  userinfo <- getUserInfo (fromString user)
   addUser user
   return user
 
