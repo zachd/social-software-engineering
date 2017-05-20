@@ -22,15 +22,6 @@
                     minCollision: 60,
                     neo4jDataUrl: 'data.json',
                     nodeRadius: 25,
-                    onNodeDoubleClick: function(node) {
-                        switch(node.id) {
-                            default:
-                                var maxNodes = 5,
-                                    data = neo4jd3.randomD3Data(node, maxNodes);
-                                neo4jd3.updateWithD3Data(data);
-                                break;
-                        }
-                    },
                     zoomFit: true
                 });
             }
