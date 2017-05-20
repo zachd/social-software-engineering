@@ -10,20 +10,17 @@ module Crawler
 
 import Data.Text
 import Data.String
-import Data.Aeson
-import Data.Aeson.TH
-import Database.Bolt
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 import GitHubAPI
 import DatabaseAPI
-import Control.Monad.Trans.Except
 import Control.Monad.IO.Class (liftIO)
 
 
 -- Type definitions
-type API = "crawl" :> Capture "user" String :> Capture "token" String :> Get '[JSON] String
+type API = "user" :> Capture "user" String :> Capture "token" String :> Get '[JSON] String
+        :<|> "org" :> Capture "user" String :> Capture "token" String :> Get '[JSON] String
 
 
 -- App setup
@@ -38,10 +35,17 @@ api = Proxy
 
 -- Server
 server :: Server API
-server = crawl
+server = user
+    :<|> org
 
-crawl :: String -> String -> Handler String
-crawl user token = liftIO $ do
-  addUser user
-  result <- crawlUser (fromString user) token
-  return user
+user :: String -> String -> Handler String
+user name token = liftIO $ do
+  addUser name
+  result <- crawlUser (fromString name) token
+  return name
+
+org :: String -> String -> Handler String
+org name token = liftIO $ do
+  addOrg name
+  result <- crawlOrg (fromString name) token
+  return name

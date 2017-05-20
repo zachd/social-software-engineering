@@ -27,10 +27,19 @@ formatRepo repo = do
     let repo_name = untagName $ GitHubRepos.repoName repo
     (owner_name, repo_name)
 
--- Begin Crawl
+-- Crawl Requests
+crawlOrg :: Text -> String -> IO (Vector (Text, Text))
+crawlOrg org token = do
+    logMsg ["Crawl started for organisation: ", unpack org, "\n"]
+    let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
+    repos <- getOrgRepos org auth
+    result <- Data.Vector.mapM addRepo repos
+    result_two <- Data.Vector.mapM (crawlRepo auth) repos
+    return repos
+
 crawlUser :: Text -> String -> IO (Vector (Text, Text))
 crawlUser user token = do
-    logMsg ["Crawl started from user: ", unpack user, "\n"]
+    logMsg ["Crawl started for user: ", unpack user, "\n"]
     let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
     repos <- getUserRepos user auth
     result <- Data.Vector.mapM addRepo repos
@@ -54,6 +63,15 @@ getUserInfo name = do
         Right res -> return res
     return result
 
+getOrgRepos :: Text -> Maybe Auth -> IO (Vector (Text, Text))
+getOrgRepos name auth = do
+    let org = GitHub.mkOrganizationName name
+    request <- GitHubRepos.organizationRepos' auth org RepoPublicityPublic
+    result <- case request of
+        Left e -> error $ show e
+        Right res -> return res
+    return $ Data.Vector.map formatRepo result
+
 getUserRepos :: Text -> Maybe Auth -> IO (Vector (Text, Text))
 getUserRepos name auth = do
     let owner = GitHub.mkOwnerName name
@@ -62,15 +80,6 @@ getUserRepos name auth = do
         Left e -> error $ show e
         Right res -> return res
     return $ Data.Vector.map formatRepo result
-
-getUserFollowers :: Text -> IO (Vector Text)
-getUserFollowers name = do
-    let user = GitHub.mkUserName name
-    request <- GitHubFollowers.usersFollowing user
-    result <- case request of
-        Left e -> error $ show e
-        Right res -> return res
-    return $ Data.Vector.map formatUser result
 
 getRepoContributors :: (Text, Text) -> Maybe Auth -> IO (Vector Text)
 getRepoContributors (owner, repo) auth = do

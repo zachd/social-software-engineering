@@ -17,6 +17,13 @@ config = def { user = "neo4j", password = "neo4j"}
 
 
 -- Insert Functions
+addOrg :: String -> IO()
+addOrg org = do
+    pipe <- connect config
+    result <- run pipe $ queryP "MERGE (n:Org {name: {name}})"
+                              (fromList [("name", T (fromString org))])
+    close pipe
+
 addUser :: String -> IO()
 addUser user = do
     pipe <- connect config
