@@ -2,25 +2,36 @@
 
 module GitHubAPI where
 
+import DatabaseAPI
 import Data.Text
 import Data.Vector
-
 import GitHub
 import GitHub.Data.Repos
 import qualified GitHub.Endpoints.Users as GitHubUsers
 import qualified GitHub.Endpoints.Repos as GitHubRepos
 import qualified GitHub.Endpoints.Users.Followers as GitHubFollowers
 
-
-formatRepo :: Repo -> Text
-formatRepo = GitHubRepos.untagName . GitHub.Data.Repos.repoName
+-- Formatting
+formatRepo :: Repo -> String
+formatRepo = formatName . GitHubRepos.repoName
 
 formatUser :: SimpleUser -> Text
-formatUser = GitHub.untagName . GitHub.simpleUserLogin
+formatUser = untagName . GitHub.simpleUserLogin
 
 formatContributor :: Contributor -> Text
 formatContributor (KnownContributor contributions avatarUrl name url uid gravatar) = GitHub.untagName name
 
+
+-- Begin Crawl
+crawlUser :: Text -> IO (Vector Repo)
+crawlUser user = do
+    logMsg ["Crawl started from user: ", unpack user, "\n"]
+    repos <- getUserRepos user
+    add <- Data.Vector.mapM addRepo repos
+    return repos
+
+
+-- API Requests
 getUserInfo :: Text -> IO User
 getUserInfo name = do
     let user = GitHub.mkUserName name
@@ -30,14 +41,14 @@ getUserInfo name = do
         Right res -> return res
     return result
 
-getUserRepos :: Text -> IO (Vector Text)
+getUserRepos :: Text -> IO (Vector Repo)
 getUserRepos name = do
     let owner = GitHub.mkOwnerName name
     request <- GitHubRepos.userRepos owner GitHub.Data.Repos.RepoPublicityAll
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
-    return $ Data.Vector.map formatRepo result
+    return $ result
 
 getUserFollowers :: Text -> IO (Vector Text)
 getUserFollowers name = do
