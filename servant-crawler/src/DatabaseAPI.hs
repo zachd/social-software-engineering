@@ -6,10 +6,10 @@ import Database.Bolt hiding(unpack)
 import Data.String
 import Data.Text
 import Data.Map
-import GitHub
+import GitHub hiding(query)
 import GitHub.Data.Repos
 import GitHub.Data.Definitions
-import qualified GitHub.Endpoints.Repos as GitHubRepos
+import qualified GitHub.Endpoints.Repos as GitHubRepos hiding(query)
 
 -- Neo4J Config
 config :: BoltCfg
@@ -31,10 +31,13 @@ addRepo user repo = do
     let repo_name = formatName $ GitHubRepos.repoName repo
     logMsg ["Adding Repo: ", owner_name, "/", repo_name, "\n"]
     pipe <- connect config
-    result <- run pipe $ queryP "MERGE (u:User {name: {user}})-[:CONTRIBUTES]->(r:Repo {owner: {owner}, name: {name}})"
-                              (fromList [("user", T(user)), ("owner", T(fromString owner_name)), ("name", T (fromString repo_name))])
+    result <- run pipe $ queryP "CREATE (n:Repo {owner: {owner}, name: {name}})"
+                                (fromList [("owner", T(fromString owner_name)), ("name", T (fromString repo_name))])
+    result <- run pipe $ query $ Data.Text.pack $ addLink user owner_name repo_name "CONTRIBUTES"
     close pipe
 
+addLink :: Text -> String -> String -> String -> String
+addLink u o r link = "MATCH (u:User {name: '" ++ unpack u ++ "'}) MATCH (r:Repo {owner: '" ++ fromString o ++ "', name: '" ++ fromString r ++ "'}) MERGE (u)-[o:" ++ fromString link ++ "]->(r)"
 
 -- Utility Functions
 formatName :: Name a -> String
