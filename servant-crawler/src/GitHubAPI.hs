@@ -5,6 +5,7 @@ module GitHubAPI where
 import DatabaseAPI
 import Data.Text
 import Data.Vector
+import Data.String
 import GitHub
 import GitHub.Auth
 import GitHub.Data
@@ -14,21 +15,21 @@ import qualified GitHub.Endpoints.Repos as GitHubRepos
 import qualified GitHub.Endpoints.Users.Followers as GitHubFollowers
 
 -- Formatting
-formatUser :: SimpleUser -> Text
-formatUser = untagName . GitHub.simpleUserLogin
+formatUser :: SimpleUser -> String
+formatUser = unpack . untagName . GitHub.simpleUserLogin
 
-formatContributor :: Contributor -> Text
-formatContributor (KnownContributor contributions avatarUrl name url uid gravatar) = GitHub.untagName name
+formatContributor :: Contributor -> String
+formatContributor (KnownContributor contributions avatarUrl name url uid gravatar) = unpack $ untagName name
 
-formatRepo :: Repo -> (Text, Text)
+formatRepo :: Repo -> (String, String)
 formatRepo repo = do
     let owner = GitHubRepos.repoOwner repo
     let owner_name = untagName $ simpleOwnerLogin owner
     let repo_name = untagName $ GitHubRepos.repoName repo
-    (owner_name, repo_name)
+    (unpack owner_name, unpack repo_name)
 
 -- Crawl Requests
-crawlOrg :: Text -> String -> IO (Vector (Text, Text))
+crawlOrg :: Text -> String -> IO (Vector (String, String))
 crawlOrg org token = do
     logMsg ["Crawl started for organisation: ", unpack org, "\n"]
     let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
@@ -36,8 +37,8 @@ crawlOrg org token = do
     result <- Data.Vector.mapM addRepo repos
     result_two <- Data.Vector.mapM (crawlRepo auth) repos
     return repos
-    
-crawlUser :: Text -> String -> IO (Vector (Text, Text))
+
+crawlUser :: Text -> String -> IO (Vector (String, String))
 crawlUser user token = do
     logMsg ["Crawl started for user: ", unpack user, "\n"]
     let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
@@ -46,9 +47,9 @@ crawlUser user token = do
     result_two <- Data.Vector.mapM (crawlRepo auth) repos
     return repos
 
-crawlRepo :: Maybe Auth -> (Text, Text) -> IO (Vector Text)
+crawlRepo :: Maybe Auth -> (String, String) -> IO (Vector String)
 crawlRepo auth (owner, repo) = do
-    logMsg ["Crawling repo: ", unpack owner, "/", unpack repo, "\n"]
+    logMsg ["Crawling repo: ", owner, "/", repo, "\n"]
     contributors <- getRepoContributors (owner, repo) auth
     result <- Data.Vector.mapM (addContributor (owner, repo)) contributors
     return contributors
@@ -63,7 +64,7 @@ getUserInfo name = do
         Right res -> return res
     return result
 
-getOrgRepos :: Text -> Maybe Auth -> IO (Vector (Text, Text))
+getOrgRepos :: Text -> Maybe Auth -> IO (Vector (String, String))
 getOrgRepos name auth = do
     let org = GitHub.mkOrganizationName name
     request <- GitHubRepos.organizationRepos' auth org RepoPublicityPublic
@@ -72,7 +73,7 @@ getOrgRepos name auth = do
         Right res -> return res
     return $ Data.Vector.map formatRepo result
 
-getUserRepos :: Text -> Maybe Auth -> IO (Vector (Text, Text))
+getUserRepos :: Text -> Maybe Auth -> IO (Vector (String, String))
 getUserRepos name auth = do
     let owner = GitHub.mkOwnerName name
     request <- GitHubRepos.userRepos' auth owner RepoPublicityPublic
@@ -81,10 +82,10 @@ getUserRepos name auth = do
         Right res -> return res
     return $ Data.Vector.map formatRepo result
 
-getRepoContributors :: (Text, Text) -> Maybe Auth -> IO (Vector Text)
+getRepoContributors :: (String, String) -> Maybe Auth -> IO (Vector String)
 getRepoContributors (owner, repo) auth = do
-    let github_owner = GitHub.mkOwnerName owner
-    let github_repo = GitHub.mkRepoName repo
+    let github_owner = GitHub.mkOwnerName $ fromString owner
+    let github_repo = GitHub.mkRepoName $ fromString repo
     request <- GitHubRepos.contributors' auth github_owner github_repo
     result <- case request of
         Left e -> error $ show e
