@@ -42,10 +42,10 @@ user :: String -> String -> Handler String
 user name token = liftIO $ do
   addUser name
   result <- crawlUser (fromString name) token
-  return name
+  return "Crawl Complete"
 
 org :: String -> String -> Handler String
 org name token = liftIO $ do
   addOrg name
   result <- crawlOrg (fromString name) token
-  return name
+  return "Crawl Complete"

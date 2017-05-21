@@ -14,6 +14,8 @@ import qualified GitHub.Endpoints.Users as GitHubUsers
 import qualified GitHub.Endpoints.Repos as GitHubRepos
 import qualified GitHub.Endpoints.Users.Followers as GitHubFollowers
 
+crawl_limit = 25
+
 -- Formatting
 formatUser :: SimpleUser -> String
 formatUser = unpack . untagName . GitHub.simpleUserLogin
@@ -34,8 +36,9 @@ crawlOrg org token = do
     logMsg ["Crawl started for organisation: ", unpack org, "\n"]
     let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
     repos <- getOrgRepos org auth
-    result <- Data.Vector.mapM addRepo repos
+    result <- Data.Vector.mapM (addRepo "Org") repos
     result_two <- Data.Vector.mapM (crawlRepo auth) repos
+    logMsg ["Crawl for ", unpack org, " complete!\n"]
     return repos
 
 crawlUser :: Text -> String -> IO (Vector (String, String))
@@ -43,7 +46,7 @@ crawlUser user token = do
     logMsg ["Crawl started for user: ", unpack user, "\n"]
     let auth = Just $ GitHub.Auth.OAuth $ BS.pack $ token
     repos <- getUserRepos user auth
-    result <- Data.Vector.mapM addRepo repos
+    result <- Data.Vector.mapM (addRepo "User") repos
     result_two <- Data.Vector.mapM (crawlRepo auth) repos
     return repos
 
@@ -71,7 +74,7 @@ getOrgRepos name auth = do
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
-    return $ Data.Vector.map formatRepo result
+    return $ Data.Vector.map formatRepo (Data.Vector.take crawl_limit result)
 
 getUserRepos :: Text -> Maybe Auth -> IO (Vector (String, String))
 getUserRepos name auth = do
@@ -80,7 +83,7 @@ getUserRepos name auth = do
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
-    return $ Data.Vector.map formatRepo result
+    return $ Data.Vector.map formatRepo (Data.Vector.take crawl_limit result)
 
 getRepoContributors :: (String, String) -> Maybe Auth -> IO (Vector String)
 getRepoContributors (owner, repo) auth = do
@@ -90,4 +93,4 @@ getRepoContributors (owner, repo) auth = do
     result <- case request of
         Left e -> error $ show e
         Right res -> return res
-    return $ Data.Vector.map formatContributor result
+    return $ Data.Vector.map formatContributor (Data.Vector.take crawl_limit result)
