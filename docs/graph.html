@@ -19,10 +19,8 @@
         <script type="text/javascript">
             function init() {
                 var neo4jd3 = new Neo4jd3('#neo4jd3', {
-                    minCollision: 60,
                     neo4jDataUrl: 'data/' + getParam('org') + '.json',
-                    nodeRadius: 20,
-                    zoomFit: true
+                    nodeRadius: 10
                 });
             }
             function getParam(name) {

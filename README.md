@@ -1,6 +1,6 @@
 # social-software-engineering
 
-[![Screenshot](docs/screenshot.png)]((https://zachd.github.io/social-software-engineering/)
+[![Screenshot](docs/screenshot.png)](https://zachd.github.io/social-software-engineering/)
 
 Social Software Engineering project for CS7009 2017. This project crawls from a specified User or Organisation on GitHub, gets information about the associated repos, then crawls further to get the contributors to these repos. 
 
